@@ -16,6 +16,11 @@ void Camera::Move(const Vec3& offset)
     position += offset;
 }
 
+void Camera::SetPosition(const Vec3& newPosition)
+{
+    position = newPosition;
+}
+
 Vec3 Camera::GetForward() const
 {
     const float yawRadians = Radians(yaw);
