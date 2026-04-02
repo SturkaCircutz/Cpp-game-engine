@@ -8,7 +8,7 @@ This project is a minimal C++ OpenGL voxel-style engine prototype with first-per
 - System OpenGL fixed pipeline
 - Mouse look
 - WASD movement
-- Space and Left Shift vertical movement
+- Jump, gravity, and block collision
 - Simple block world similar to a Minecraft-style sandbox scene
 
 ## Requirements
@@ -35,8 +35,7 @@ cmake --build build
 
 - `W`, `A`, `S`, `D`: move
 - Mouse: look around
-- `Space`: move up
-- `Left Shift`: move down
+- `Space`: jump
 - `Esc`: quit
 
 ## Repository workflow

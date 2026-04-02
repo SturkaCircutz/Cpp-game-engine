@@ -16,6 +16,11 @@ namespace
     constexpr int kWindowHeight = 720;
     constexpr float kMouseSensitivity = 0.1f;
     constexpr float kMoveSpeed = 5.0f;
+    constexpr float kGravity = 24.0f;
+    constexpr float kJumpSpeed = 8.5f;
+    constexpr float kPlayerRadius = 0.30f;
+    constexpr float kPlayerHeight = 1.80f;
+    constexpr float kEyeOffset = 1.62f;
 }
 
 bool Engine::Initialize()
@@ -130,20 +135,75 @@ void Engine::ProcessInput(float deltaTime)
     {
         movement += right;
     }
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    {
-        movement.y += 1.0f;
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    {
-        movement.y -= 1.0f;
-    }
 
     if (Length(movement) > 0.0f)
     {
-        movement = Normalize(movement) * (kMoveSpeed * deltaTime);
-        camera.Move(movement);
+        movement = Normalize(movement) * kMoveSpeed;
     }
+
+    const bool jumpPressed = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
+    if (jumpPressed && !jumpPressedLastFrame && isGrounded)
+    {
+        playerVelocity.y = kJumpSpeed;
+        isGrounded = false;
+    }
+    jumpPressedLastFrame = jumpPressed;
+
+    playerVelocity.x = movement.x;
+    playerVelocity.z = movement.z;
+    playerVelocity.y -= kGravity * deltaTime;
+
+    MovePlayer(playerVelocity * deltaTime);
+}
+
+void Engine::MovePlayer(const Vec3& velocityStep)
+{
+    Vec3 position = camera.GetPosition();
+
+    position.x += velocityStep.x;
+    if (IsPlayerCollidingAt(position))
+    {
+        position.x -= velocityStep.x;
+    }
+
+    position.y += velocityStep.y;
+    if (IsPlayerCollidingAt(position))
+    {
+        position.y -= velocityStep.y;
+        if (velocityStep.y < 0.0f)
+        {
+            isGrounded = true;
+        }
+        playerVelocity.y = 0.0f;
+    }
+    else
+    {
+        isGrounded = false;
+    }
+
+    position.z += velocityStep.z;
+    if (IsPlayerCollidingAt(position))
+    {
+        position.z -= velocityStep.z;
+    }
+
+    camera.SetPosition(position);
+}
+
+bool Engine::IsPlayerCollidingAt(const Vec3& cameraPosition) const
+{
+    const Vec3 minCorner(
+        cameraPosition.x - kPlayerRadius,
+        cameraPosition.y - kEyeOffset,
+        cameraPosition.z - kPlayerRadius
+    );
+    const Vec3 maxCorner(
+        cameraPosition.x + kPlayerRadius,
+        cameraPosition.y - kEyeOffset + kPlayerHeight,
+        cameraPosition.z + kPlayerRadius
+    );
+
+    return world.IntersectsSolid(minCorner, maxCorner);
 }
 
 void Engine::RenderFrame(int width, int height)

@@ -6,6 +6,8 @@
 
 #include <GL/gl.h>
 
+#include <cmath>
+
 void World::Render() const
 {
     for (int x = -12; x <= 12; ++x)
@@ -28,6 +30,67 @@ void World::Render() const
     DrawCube(-1.0f, 0.5f, -2.0f, 0.5f);
     DrawCube(0.0f, 0.5f, -2.0f, 0.5f);
     DrawCube(0.0f, 1.5f, -2.0f, 0.5f);
+}
+
+bool World::IntersectsSolid(const Vec3& minCorner, const Vec3& maxCorner) const
+{
+    const int minX = static_cast<int>(std::floor(minCorner.x));
+    const int maxX = static_cast<int>(std::ceil(maxCorner.x)) - 1;
+    const int minY = static_cast<int>(std::floor(minCorner.y));
+    const int maxY = static_cast<int>(std::ceil(maxCorner.y)) - 1;
+    const int minZ = static_cast<int>(std::floor(minCorner.z));
+    const int maxZ = static_cast<int>(std::ceil(maxCorner.z)) - 1;
+
+    for (int x = minX; x <= maxX; ++x)
+    {
+        for (int y = minY; y <= maxY; ++y)
+        {
+            for (int z = minZ; z <= maxZ; ++z)
+            {
+                if (IsSolidBlock(x, y, z))
+                {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+bool World::IsSolidBlock(int x, int y, int z) const
+{
+    if (y == -1 && x >= -12 && x <= 12 && z >= -12 && z <= 12)
+    {
+        return true;
+    }
+
+    if ((x == 3 || x == 4) && z == 2 && y >= 0 && y <= 2)
+    {
+        return true;
+    }
+
+    if (x == 3 && z == 3 && y >= 0 && y <= 2)
+    {
+        return true;
+    }
+
+    if (x == -2 && z == -2 && (y == 0 || y == 1))
+    {
+        return true;
+    }
+
+    if ((x == -1 || x == 0) && z == -2 && y == 0)
+    {
+        return true;
+    }
+
+    if (x == 0 && z == -2 && y == 1)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void World::DrawCube(float centerX, float centerY, float centerZ, float halfSize) const
