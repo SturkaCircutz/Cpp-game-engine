@@ -38,3 +38,12 @@ cmake --build build
 - `Space`: move up
 - `Left Shift`: move down
 - `Esc`: quit
+
+## Repository workflow
+
+- Stable branch: `master`
+- Integration branch: `develop`
+- Release branch example: `release/0.1.0`
+- Feature branch example: `feature/player-collision`
+
+See `CONTRIBUTING.md` and `docs/branching.md` for the intended workflow.
