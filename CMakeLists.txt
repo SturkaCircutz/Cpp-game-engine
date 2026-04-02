@@ -12,11 +12,9 @@ add_executable(MiniVoxelEngine
     src/main.cpp
     src/Camera.cpp
     src/Engine.cpp
-    src/Math.cpp
+    src/VecMath.cpp
     src/World.cpp
 )
-
-target_include_directories(MiniVoxelEngine PRIVATE src)
 
 target_link_libraries(MiniVoxelEngine PRIVATE glfw OpenGL::GL OpenGL::GLU)
 
