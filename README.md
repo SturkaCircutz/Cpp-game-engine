@@ -45,5 +45,7 @@ cmake --build build
 - Integration branch: `develop`
 - Release branch example: `release/0.1.0`
 - Feature branch example: `feature/player-collision`
+- Chore branch example: `chore/windows-build-fix`
+- Fix branch example: `fix/camera-drift`
 
 See `CONTRIBUTING.md` and `docs/branching.md` for the intended workflow.
