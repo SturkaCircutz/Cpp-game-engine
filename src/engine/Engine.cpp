@@ -1,4 +1,4 @@
-#include "Engine.h"
+#include "engine/Engine.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <random>
 
 namespace
 {
@@ -21,6 +22,11 @@ namespace
     constexpr float kPlayerRadius = 0.30f;
     constexpr float kPlayerHeight = 1.80f;
     constexpr float kEyeOffset = 1.62f;
+    constexpr int kSpawnSearchMin = -24;
+    constexpr int kSpawnSearchMax = 24;
+    constexpr float kFogColor[4] = {0.52f, 0.78f, 0.96f, 1.0f};
+    constexpr float kFogStart = 18.0f;
+    constexpr float kFogEnd = 42.0f;
 }
 
 bool Engine::Initialize()
@@ -47,9 +53,26 @@ bool Engine::Initialize()
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glClearColor(0.52f, 0.78f, 0.96f, 1.0f);
+    glClearColor(kFogColor[0], kFogColor[1], kFogColor[2], kFogColor[3]);
+    glEnable(GL_FOG);
+    glFogi(GL_FOG_MODE, GL_LINEAR);
+    glFogfv(GL_FOG_COLOR, kFogColor);
+    glFogf(GL_FOG_START, kFogStart);
+    glFogf(GL_FOG_END, kFogEnd);
+    glHint(GL_FOG_HINT, GL_NICEST);
+
+    if (!world.InitializeRendering())
+    {
+        std::cerr << "Failed to initialize world rendering resources.\n";
+        glfwDestroyWindow(window);
+        window = nullptr;
+        glfwTerminate();
+        return false;
+    }
+
+    camera.SetPosition(FindSafeSpawnPosition());
+    isGrounded = false;
+    playerVelocity = Vec3();
 
     return true;
 }
@@ -78,6 +101,8 @@ void Engine::Run()
 
 void Engine::Shutdown()
 {
+    world.ShutdownRendering();
+
     if (window != nullptr)
     {
         glfwDestroyWindow(window);
@@ -206,6 +231,43 @@ bool Engine::IsPlayerCollidingAt(const Vec3& cameraPosition) const
     return world.IntersectsSolid(minCorner, maxCorner);
 }
 
+Vec3 Engine::FindSafeSpawnPosition() const
+{
+    std::random_device randomDevice;
+    std::mt19937 generator(randomDevice());
+    std::uniform_int_distribution<int> positionDistribution(kSpawnSearchMin, kSpawnSearchMax);
+
+    for (int attempt = 0; attempt < 64; ++attempt)
+    {
+        const int spawnX = positionDistribution(generator);
+        const int spawnZ = positionDistribution(generator);
+        const int surfaceY = world.GetSurfaceHeight(spawnX, spawnZ);
+
+        for (int offsetY = 2; offsetY < 20; ++offsetY)
+        {
+            const Vec3 candidate(
+                static_cast<float>(spawnX) + 0.5f,
+                static_cast<float>(surfaceY + offsetY) + kEyeOffset,
+                static_cast<float>(spawnZ) + 0.5f
+            );
+
+            if (!IsPlayerCollidingAt(candidate))
+            {
+                return candidate;
+            }
+        }
+    }
+
+    const int fallbackX = 0;
+    const int fallbackZ = 0;
+    const int fallbackSurfaceY = world.GetSurfaceHeight(fallbackX, fallbackZ);
+    return Vec3(
+        static_cast<float>(fallbackX) + 0.5f,
+        static_cast<float>(fallbackSurfaceY + 12) + kEyeOffset,
+        static_cast<float>(fallbackZ) + 0.5f
+    );
+}
+
 void Engine::RenderFrame(int width, int height)
 {
     const int safeHeight = height > 0 ? height : 1;
@@ -239,7 +301,7 @@ void Engine::RenderFrame(int width, int height)
 
     glLoadMatrixf(viewMatrix);
 
-    world.Render();
+    world.Render(position);
 }
 
 void Engine::ApplyPerspective(float aspectRatio, float fieldOfView, float nearPlane, float farPlane) const

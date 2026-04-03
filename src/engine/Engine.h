@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Camera.h"
-#include "World.h"
+#include "engine/Camera.h"
+#include "world/World.h"
 
 struct GLFWwindow;
 
@@ -16,6 +16,7 @@ private:
     void ProcessInput(float deltaTime);
     void MovePlayer(const Vec3& velocityStep);
     bool IsPlayerCollidingAt(const Vec3& cameraPosition) const;
+    Vec3 FindSafeSpawnPosition() const;
     void RenderFrame(int width, int height);
     void ApplyPerspective(float aspectRatio, float fieldOfView, float nearPlane, float farPlane) const;
 

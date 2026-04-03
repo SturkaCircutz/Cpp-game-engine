@@ -9,12 +9,19 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
 add_executable(MiniVoxelEngine
-    src/main.cpp
-    src/Camera.cpp
-    src/Engine.cpp
-    src/VecMath.cpp
-    src/World.cpp
+    src/app/main.cpp
+    src/engine/Camera.cpp
+    src/engine/Engine.cpp
+    src/math/VecMath.cpp
+    src/render/TextureAtlas.cpp
+    src/world/Chunk.cpp
+    src/world/ChunkMesher.cpp
+    src/world/PerlinNoise.cpp
+    src/world/TerrainGenerator.cpp
+    src/world/World.cpp
 )
+
+target_include_directories(MiniVoxelEngine PRIVATE src)
 
 target_link_libraries(MiniVoxelEngine PRIVATE glfw OpenGL::GL OpenGL::GLU)
 
