@@ -1,7 +1,7 @@
-#include "Camera.h"
+#include "engine/Camera.h"
 
 Camera::Camera()
-    : position(0.0f, 2.2f, 6.0f), yaw(-90.0f), pitch(0.0f)
+    : position(0.0f, 12.0f, 6.0f), yaw(-90.0f), pitch(0.0f)
 {
 }
 

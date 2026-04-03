@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VecMath.h"
+#include "math/VecMath.h"
 
 class Camera
 {
