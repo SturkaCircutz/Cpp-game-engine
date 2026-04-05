@@ -1,14 +1,14 @@
-#include "Engine.h"
+#include "app/Application.h"
 
 int main()
 {
-    Engine engine;
-    if (!engine.Initialize())
+    Application application;
+    if (!application.Initialize())
     {
         return 1;
     }
 
-    engine.Run();
-    engine.Shutdown();
+    application.Run();
+    application.Shutdown();
     return 0;
 }
