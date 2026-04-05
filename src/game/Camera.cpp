@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "game/Camera.h"
 
 Camera::Camera()
     : position(0.0f, 2.2f, 6.0f), yaw(-90.0f), pitch(0.0f)
@@ -14,6 +14,11 @@ void Camera::UpdateDirection(float deltaYaw, float deltaPitch)
 void Camera::Move(const Vec3& offset)
 {
     position += offset;
+}
+
+void Camera::SetPosition(const Vec3& newPosition)
+{
+    position = newPosition;
 }
 
 Vec3 Camera::GetForward() const
@@ -39,14 +44,4 @@ Vec3 Camera::GetRight() const
 Vec3 Camera::GetPosition() const
 {
     return position;
-}
-
-float Camera::GetYaw() const
-{
-    return yaw;
-}
-
-float Camera::GetPitch() const
-{
-    return pitch;
 }
